@@ -1,0 +1,35 @@
+name: Focus Metronome (macOS build)
+
+on:
+  push:
+    paths:
+      - "FocusMetronome/**"
+      - ".github/workflows/focus-metronome.yml"
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-14
+    defaults:
+      run:
+        working-directory: FocusMetronome
+    steps:
+      - uses: actions/checkout@v4
+      - name: Swift version
+        run: xcrun swiftc --version
+      - name: Scheduler tests
+        run: ./scripts/test.sh
+      - name: Build app
+        run: ./scripts/build.sh
+      - name: Check bundle
+        run: |
+          plutil -lint build/FocusMetronome.app/Contents/Info.plist
+          /usr/libexec/PlistBuddy -c "Print :LSUIElement" build/FocusMetronome.app/Contents/Info.plist
+          lipo -archs build/FocusMetronome.app/Contents/MacOS/FocusMetronome
+          ls -la build/FocusMetronome.app/Contents/Resources
+      - name: Zip
+        run: ditto -c -k --keepParent build/FocusMetronome.app build/FocusMetronome.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: FocusMetronome
+          path: FocusMetronome/build/FocusMetronome.zip
