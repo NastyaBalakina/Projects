@@ -27,6 +27,19 @@ jobs:
           /usr/libexec/PlistBuddy -c "Print :LSUIElement" build/FocusMetronome.app/Contents/Info.plist
           lipo -archs build/FocusMetronome.app/Contents/MacOS/FocusMetronome
           ls -la build/FocusMetronome.app/Contents/Resources
+      - name: Menu bar screenshot
+        run: |
+          open build/FocusMetronome.app
+          sleep 6
+          pgrep -x FocusMetronome && echo "running" || echo "NOT RUNNING"
+          screencapture -x build/screen.png || true
+          sips -c 60 4000 --cropOffset 0 0 build/screen.png --out build/menubar.png || true
+      - uses: actions/upload-artifact@v4
+        with:
+          name: screenshots
+          path: |
+            FocusMetronome/build/screen.png
+            FocusMetronome/build/menubar.png
       - name: Zip
         run: ditto -c -k --keepParent build/FocusMetronome.app build/FocusMetronome.zip
       - uses: actions/upload-artifact@v4
