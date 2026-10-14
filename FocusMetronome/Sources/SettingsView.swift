@@ -23,7 +23,8 @@ struct SettingsView: View {
             }
             .padding(16)
         }
-        .frame(width: 460)
+        // Grouped Form прокручивается и сам высоты не просит — без явного размера вкладки схлопываются.
+        .frame(width: 480, height: 600)
         .onAppear { settings.refreshLaunchAtLogin() }
     }
 

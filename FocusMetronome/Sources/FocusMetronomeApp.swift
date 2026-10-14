@@ -8,9 +8,18 @@ struct FocusMetronomeApp: App {
     init() {
         let settings = AppSettings()
         _settings = StateObject(wrappedValue: settings)
-        _controller = StateObject(wrappedValue: MetronomeController(settings: settings))
+        let controller = MetronomeController(settings: settings)
+        _controller = StateObject(wrappedValue: controller)
         // Подстраховка к LSUIElement в Info.plist: ни Dock, ни Cmd+Tab.
         NSApplication.shared.setActivationPolicy(.accessory)
+        // Для проверки в CI: открыть окно настроек сразу после запуска.
+        if CommandLine.arguments.contains("--show-settings") {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                MainActor.assumeIsolated {
+                    SettingsWindowController.shared.show(settings: settings, controller: controller)
+                }
+            }
+        }
     }
 
     var body: some Scene {

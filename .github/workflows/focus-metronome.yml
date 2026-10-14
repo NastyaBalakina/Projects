@@ -27,23 +27,16 @@ jobs:
           /usr/libexec/PlistBuddy -c "Print :LSUIElement" build/FocusMetronome.app/Contents/Info.plist
           lipo -archs build/FocusMetronome.app/Contents/MacOS/FocusMetronome
           ls -la build/FocusMetronome.app/Contents/Resources
-      - name: Menu bar screenshot
+      - name: Settings window screenshot
         run: |
-          open build/FocusMetronome.app
+          open build/FocusMetronome.app --args --show-settings
           sleep 6
           pgrep -x FocusMetronome && echo "running" || echo "NOT RUNNING"
           screencapture -x build/screen.png || true
-          sips -c 60 4000 --cropOffset 0 0 build/screen.png --out build/menubar.png || true
-          W=$(sips -g pixelWidth build/screen.png | awk '/pixelWidth/{print $2}')
-          sips -c 50 700 --cropOffset 0 $((W-700)) build/screen.png --out build/right.png
-          echo "SCREEN_WIDTH=$W"
-          echo "BEGIN_PNG"; base64 -i build/right.png | fold -w 1000; echo "END_PNG"
-      - uses: actions/upload-artifact@v4
-        with:
-          name: screenshots
-          path: |
-            FocusMetronome/build/screen.png
-            FocusMetronome/build/menubar.png
+          # Окно 480×600 в центре экрана 1920×1080: вырезаем с запасом и уменьшаем.
+          sips -c 760 640 build/screen.png --out build/settings.png
+          sips -Z 480 build/settings.png --out build/settings.png
+          echo "BEGIN_PNG"; base64 -i build/settings.png | fold -w 1000; echo "END_PNG"
       - name: Zip
         run: ditto -c -k --keepParent build/FocusMetronome.app build/FocusMetronome.zip
       - uses: actions/upload-artifact@v4
