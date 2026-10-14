@@ -34,6 +34,10 @@ jobs:
           pgrep -x FocusMetronome && echo "running" || echo "NOT RUNNING"
           screencapture -x build/screen.png || true
           sips -c 60 4000 --cropOffset 0 0 build/screen.png --out build/menubar.png || true
+          W=$(sips -g pixelWidth build/screen.png | awk '/pixelWidth/{print $2}')
+          sips -c 50 700 --cropOffset 0 $((W-700)) build/screen.png --out build/right.png
+          echo "SCREEN_WIDTH=$W"
+          echo "BEGIN_PNG"; base64 -i build/right.png | fold -w 1000; echo "END_PNG"
       - uses: actions/upload-artifact@v4
         with:
           name: screenshots
