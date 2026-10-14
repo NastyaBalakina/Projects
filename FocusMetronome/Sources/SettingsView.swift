@@ -128,4 +128,10 @@ final class SettingsWindowController {
         NSApp.activate(ignoringOtherApps: true)
         window?.makeKeyAndOrderFront(nil)
     }
+
+    func logFrame() {
+        guard let window else { return }
+        print("SETTINGS_WINDOW content=\(window.contentLayoutRect.size)")
+        fflush(stdout)
+    }
 }

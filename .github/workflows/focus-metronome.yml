@@ -27,16 +27,13 @@ jobs:
           /usr/libexec/PlistBuddy -c "Print :LSUIElement" build/FocusMetronome.app/Contents/Info.plist
           lipo -archs build/FocusMetronome.app/Contents/MacOS/FocusMetronome
           ls -la build/FocusMetronome.app/Contents/Resources
-      - name: Settings window screenshot
+      - name: Settings window size
         run: |
-          open build/FocusMetronome.app --args --show-settings
+          ./build/FocusMetronome.app/Contents/MacOS/FocusMetronome --show-settings > build/run.log 2>&1 &
           sleep 6
-          pgrep -x FocusMetronome && echo "running" || echo "NOT RUNNING"
-          screencapture -x build/screen.png || true
-          # Окно 480×600 в центре экрана 1920×1080: вырезаем с запасом и уменьшаем.
-          sips -c 760 640 build/screen.png --out build/settings.png
-          sips -Z 480 build/settings.png --out build/settings.png
-          echo "BEGIN_PNG"; base64 -i build/settings.png | fold -w 1000; echo "END_PNG"
+          kill %1 || true
+          cat build/run.log
+          grep -q "SETTINGS_WINDOW" build/run.log
       - name: Zip
         run: ditto -c -k --keepParent build/FocusMetronome.app build/FocusMetronome.zip
       - uses: actions/upload-artifact@v4

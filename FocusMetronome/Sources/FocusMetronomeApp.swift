@@ -17,6 +17,7 @@ struct FocusMetronomeApp: App {
             DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                 MainActor.assumeIsolated {
                     SettingsWindowController.shared.show(settings: settings, controller: controller)
+                    SettingsWindowController.shared.logFrame()
                 }
             }
         }
